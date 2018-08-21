@@ -1,0 +1,69 @@
+%%
+%% pytorch-neural-doodle/docs/imports.tex
+%%
+%% Created by Paul Warkentin <paul@warkentin.email> on 21/08/2018.
+%% Updated by Paul Warkentin <paul@warkentin.email> on 21/08/2018.
+%%
+
+% page paddings
+\makeatletter%
+\if@twocolumn%
+  \usepackage[top=4cm,bottom=3cm,left=2cm,right=2cm]{geometry}%
+\else%
+  \usepackage[top=4cm,bottom=3cm,left=3cm,right=3cm]{geometry}%
+\fi
+\makeatother
+
+% language
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+% use captions
+\usepackage{caption}
+\usepackage{subcaption}
+
+\captionsetup[figure]{labelfont=bf,textfont=it}
+\captionsetup[table]{labelfont=bf,textfont=it}
+
+% math
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{xfrac}
+
+% pretty tables
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+% create plots etc.
+\usepackage{tikz}
+\usepackage{pgfplots}
+
+\pgfplotsset{
+  table/search path={\rootpath/plots/},
+}
+
+% custom headers and footers
+\usepackage{scrpage2}
+
+% clickeable links
+\usepackage{hyperref}
+
+% correct placing long figures
+\usepackage{float}
+
+% bibliography
+\usepackage[backend=biber,sorting=none]{biblatex}
+
+\addbibresource{\rootpath/resources.bib}
+
+% adjust default path for graphics
+\graphicspath{{figures/}}
+
+% disable paragraph indention
+\setlength{\parindent}{0pt}

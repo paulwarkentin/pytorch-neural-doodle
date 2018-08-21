@@ -1,0 +1,35 @@
+## RUN
+/run/*
+!/run/.gitkeep
+
+## MODELS
+/models/*
+!/models/.gitkeep
+
+## PYTHON CACHE
+__pycache__/
+
+## NOTEBOOK CHECKPOINTS
+.ipynb_checkpoints/
+
+## LATEX TEMPORARY FILES
+*.aux
+*.log
+*.toc
+*.idx
+*.run.xml
+
+## LATEX BEAMER
+*.snm
+*.vrb
+*.nav
+*.out
+
+## BIBTEX
+*.bbl
+*.bcf
+*.blg
+
+## MACOS HIDDEN SYSTEM FILES
+.DS_Store
+.MACOS
