@@ -121,26 +121,26 @@ if __name__ == "__main__":
 	if not should_continue:
 		exit()
 
+	# determine compute device
+	if torch.cuda.is_available():
+		device = torch.device("cuda")
+	else:
+		device = torch.device("cpu")
+
 	# initialize model
 	model = VGG19(input_channels=3)
-
 	vgg_19_path = get_full_path("models", "vgg_19_imagenet", "vgg_19.minimum.pkl")
 	if not os.path.isfile(vgg_19_path):
 		logging_error("Please download the weights and biases of the VGG 19 network from " \
 					  "http://download.tensorflow.org/models/vgg_19_2016_08_28.tar.gz, extract the archive and run the Python script "\
 					  "`extract_vgg_19_weights.py`.")
 	model.initialize(vgg_19_path)
-
-	# move data to gpu if possible
-	if torch.cuda.is_available():
-		device = torch.device("cuda")
-	else:
-		device = torch.device("cpu")
+	model.to(device)
 
 	# load input data
-	input_style    = load(arguments.input_style_file, device=device)
-	input_map      = load(arguments.input_map_file,   device=device)
-	output_map     = load(arguments.output_map_file,  device=device)
+	input_style = load(arguments.input_style_file, device=device)
+	input_map   = load(arguments.input_map_file,   device=device)
+	output_map  = load(arguments.output_map_file,  device=device)
 	#output_content = load(arguments.output_content_file)
 
 	# perform forward pass of model to extract response for content loss

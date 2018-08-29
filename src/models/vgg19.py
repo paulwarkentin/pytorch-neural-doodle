@@ -103,17 +103,11 @@ class VGG19(nn.Module):
 		with open(filename, "rb") as file:
 			data = pickle.load(file)
 
-		# select device for this model to live on
-		if torch.cuda.is_available():
-			self.device = torch.device("cuda")
-		else:
-			self.device = torch.device("cpu")
-
 		# initialize parameters
 		for name in data:
 			module = getattr(self, name)
-			module.weight.data = torch.from_numpy(data[name][0]).double().to(self.device)
-			module.bias.data = torch.from_numpy(data[name][1]).double().to(self.device)
+			module.weight.data = torch.from_numpy(data[name][0]).double()
+			module.bias.data = torch.from_numpy(data[name][1]).double()
 
 
 	def forward(self, image_input):
