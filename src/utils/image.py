@@ -16,7 +16,7 @@ import torch
 from skimage import io
 from .common.logging import logging_error 
 
-def load(filepath):
+def load(filepath, device=torch.device("cpu")):
 	"""Load image from filepath as tensor.
 
 	Arguments:
@@ -28,4 +28,4 @@ def load(filepath):
 	if not os.path.isfile(filepath):
 		logging_error("File {} does not exist.".format(filepath), should_exit = True)
 	image = io.imread(filepath).transpose((2,0,1))
-	return torch.from_numpy(image).double().unsqueeze(0)
+	return torch.from_numpy(image).double().unsqueeze(0).to(device)

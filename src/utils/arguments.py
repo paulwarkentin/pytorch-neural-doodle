@@ -1,5 +1,5 @@
 ##
-## pytorch-neural-doodle/src/src/utils/arguments.py
+## pytorch-neural-doodle/src/utils/arguments.py
 ##
 ## Created by Paul Warkentin <paul@warkentin.email> on 05/08/2018.
 ## Created by Paul Warkentin <paul@warkentin.email> on 16/08/2018.

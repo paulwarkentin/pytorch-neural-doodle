@@ -1,0 +1,1 @@
+* argparse validation in generate.py: --style-layers and --content-layers need to be validated as "list of string" type
