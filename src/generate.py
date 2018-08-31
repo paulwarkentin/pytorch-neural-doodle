@@ -2,13 +2,13 @@
 ## pytorch-neural-doodle/src/generate.py
 ##
 ## Created by Paul Warkentin <paul@warkentin.email> on 10/08/2018.
-## Updated by Bastian Boll <mail@bbboll.com> on 29/08/2018.
+## Updated by Bastian Boll <mail@bbboll.com> on 31/08/2018.
 ##
 
-import argparse
 import numpy as np
 import os
 import sys
+import time
 
 __exec_dir = sys.path[0]
 while os.path.basename(__exec_dir) != "src":
@@ -17,93 +17,18 @@ while os.path.basename(__exec_dir) != "src":
 
 import torch
 
-from utils.arguments import positive_float_type, exclusive_positive_int_type
 from utils.common.files import get_full_path
 from utils.common.logging import logging_info
-from utils.common.terminal import query_yes_no
 from utils.image import load
+from utils.common.terminal import query_yes_no
+from cli import parse_arguments
 
 from models import VGG19
+from loss import StyleLoss
 
 
 if __name__ == "__main__":
-
-	# parse arguments
-	parser = argparse.ArgumentParser(
-		description = "Generate a new image."
-	)
-	parser.add_argument(
-		"--input-style-file",
-		default = None,
-		type = str,
-		required = True,
-		help = "Path to the input style file."
-	)
-	parser.add_argument(
-		"--input-map-file",
-		default = None,
-		type = str,
-		required = True,
-		help = "Path to the input map file."
-	)
-	parser.add_argument(
-		"--output-file",
-		default = None,
-		type = str,
-		required = True,
-		help = "Path to the output file to be generated."
-	)
-	parser.add_argument(
-		"--output-content-file",
-		default = None,
-		type = str,
-		required = False,
-		help = "Path to the content file."
-	)
-	parser.add_argument(
-		"--output-map-file",
-		default = None,
-		type = str,
-		required = True,
-		help = "Path to the output map file."
-	)
-	parser.add_argument(
-		"--content-weight",
-		default = 10.0,
-		type = positive_float_type,
-		required = False,
-		help = "Weight of the content relative to the style (alpha)."
-	)
-	parser.add_argument(
-		"--content-layers",
-		nargs = "+",
-		default = ["4_2"],
-		type = positive_float_type,
-		required = False,
-		help = "The layer to use for the content."
-	)
-	parser.add_argument(
-		"--style-weight",
-		default = 25.0,
-		type = positive_float_type,
-		required = False,
-		help = "Weight of the style relative to the style (beta)."
-	)
-	parser.add_argument(
-		"--num-phases",
-		default = 3,
-		type = exclusive_positive_int_type,
-		required = False,
-		help = "The number of phases to process."
-	)
-	parser.add_argument(
-		"--map-channel-weight",
-		default = 50.0,
-		type = positive_float_type,
-		required = False,
-		help = "Weight for map channels (gamma)."
-	)
-	arguments = parser.parse_args()
+	arguments = parse_arguments()
 
 	# print some information
 	logging_info("Generate a new image.")
@@ -114,6 +39,7 @@ if __name__ == "__main__":
 	logging_info("Output content file: {}".format(arguments.output_content_file))
 	logging_info("Content weight:      {}".format(arguments.content_weight))
 	logging_info("Content layers:      {}".format(arguments.content_layers))
+	logging_info("Style layers:        {}".format(arguments.style_layers))
 	logging_info("Style weight:        {}".format(arguments.style_weight))
 	logging_info("Map channel weight:  {}".format(arguments.map_channel_weight))
 
@@ -146,8 +72,16 @@ if __name__ == "__main__":
 	# perform forward pass of model to extract response for content loss
 	#content_response = model.forward(output_content)
 
+	# perform forward pass of model to extract response for style loss
+	style_response = model.forward(input_style, extract_layers=arguments.style_layers)
+
+	# initialize style loss
+	style_loss = StyleLoss(style_response, arguments.style_layers, stride=12)
+
 	# TEST:
-	model.forward(input_style)
+	activations = model.forward(input_map, extract_layers=arguments.style_layers)
+
+	style_loss.loss(activations)
 
 	# main loop
 	for ii in range(arguments.num_phases):

@@ -2,7 +2,7 @@
 ## pytorch-neural-doodle/src/models/generative_model.py
 ##
 ## Created by Paul Warkentin <paul@warkentin.email> on 08/08/2018.
-## Updated by Bastian Boll <mail@bbboll.com> on 29/08/2018.
+## Updated by Bastian Boll <mail@bbboll.com> on 31/08/2018.
 ##
 
 import pickle
@@ -110,7 +110,7 @@ class VGG19(nn.Module):
 			module.bias.data = torch.from_numpy(data[name][1]).double()
 
 
-	def forward(self, image_input):
+	def forward(self, image_input, extract_layers=["5_4"]):
 		"""Do forward pass of the network.
 
 		Arguments:
@@ -124,16 +124,16 @@ class VGG19(nn.Module):
 		x = image_input
 		for block_ii, num_convs in enumerate([2, 2, 4, 4, 4]):
 			conv_block_name = "conv{}".format(block_ii + 1)
-			map_block_name = "map{}".format(block_ii + 1)
-			sem_block_name = "sem{}".format(block_ii + 1)
 			nn_block_name = "nn{}".format(block_ii + 1)
 
 			for conv_ii in range(num_convs):
 				conv_name = "{}_{}".format(conv_block_name, conv_ii + 1)
+				conv_ind = "{}_{}".format(block_ii + 1, conv_ii + 1)
 				x = getattr(self, conv_name)(x)
 				x = self.relu(x)
-				outputs[conv_name] = x
+				if conv_ind in extract_layers:
+					outputs[conv_name] = x
 
 			x = self.pool(x)
-
+		
 		return outputs
