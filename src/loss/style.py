@@ -28,14 +28,17 @@ class StyleLoss(nn.Module):
 		unfold:               Unfolding convolution to compute patches.
 		layers:               Layers for which response is compared.
 		style_patches{}:      Patches of the style image for each layer.
+		output_maps{}:        Downsampled output maps for each layer.
 		style_normalizer{}:   Norms of style patches for each layer.
 	"""
 
-	def __init__(self, style_response, layers, size=(3,3), stride=3):
+	def __init__(self, style_response, style_map, output_map, layers, map_channel_weight, size=(3,3), stride=3):
 		"""Initialize a new loss function.
 
 		Arguments:
 			style_response (tensor):  Model response to style image.
+			style_map (tensor):       Map for input style.
+			output_map (tensor):      Map for output image.
 			layers (list):            Layers for which response is compared.
 			size (tuple):             Size of single patch.
 			stride (int):             Stride of sliding blocks in spatial dimensions.
@@ -47,13 +50,23 @@ class StyleLoss(nn.Module):
 		self.layers = layers
 
 		for layer in layers:
-			# unfold style response
 			style_resp = style_response["conv{}".format(layer)]
-			style_patches = self.unfold(style_resp)
-			(_, patch_count, patch_size) = style_patches.size()
-			style_patches = style_patches.view(patch_count, patch_size)
-			style_normalizer = torch.reciprocal(torch.norm(style_patches, p=2, dim=1))
+			patch_height = style_resp.size()[2]
+
+			# downsample style maps
+			down = int(style_map.size()[2] / patch_height)
+			style_map_down = nn.AvgPool2d((down, down))(style_map)
+			output_map_down = nn.AvgPool2d((down, down))(output_map)
+
+			# unfold style response
+			style_resp = torch.cat((style_resp, map_channel_weight*output_map_down), dim=1)
+			style_patches = torch.squeeze(self.unfold(style_resp))
+
+			# compute normalizer for cosine distance
+			style_normalizer = torch.reciprocal(torch.norm(style_patches, p=2, dim=0))
+
 			setattr(self, "style_patches{}".format(layer), style_patches)
+			setattr(self, "output_maps{}".format(layer), map_channel_weight*output_map_down)
 			setattr(self, "style_normalizer{}".format(layer), style_normalizer)
 
 	
@@ -63,15 +76,19 @@ class StyleLoss(nn.Module):
 		Arguments:
 			model_response (tensor): Model response to image.
 		"""
+		losses = []
 		for l in self.layers:
 			# collect response patches for this layer
 			style_patches = getattr(self, "style_patches{}".format(l))
-			(patch_count, patch_size) = style_patches.size()
-			img_patches = self.unfold(model_response["conv{}".format(l)]).view(patch_count, patch_size)
+			(patch_size, patch_count) = style_patches.size()
+			output_map = getattr(self, "output_maps{}".format(l))
+			img_patches = model_response["conv{}".format(l)]
+			img_patches = torch.cat((img_patches, output_map), dim=1)
+			img_patches = torch.squeeze(self.unfold(img_patches))
 
 			# compute nearest neighbours
-			similarity_matrix = img_patches @ style_patches.t()
-			img_normalizer = torch.reciprocal(torch.norm(img_patches, p=2, dim=1))
+			similarity_matrix = img_patches.t() @ style_patches
+			img_normalizer = torch.reciprocal(torch.norm(img_patches, p=2, dim=0))
 			style_normalizer = getattr(self, "style_normalizer{}".format(l))
 			similarity_matrix = img_normalizer.expand(patch_count, patch_count) * similarity_matrix 
 			similarity_matrix = similarity_matrix.t() * style_normalizer.expand(patch_count, patch_count)
@@ -81,4 +98,5 @@ class StyleLoss(nn.Module):
 			del similarity_matrix
 			del img_normalizer
 
-			print(nearest_neighbours.size())
+			losses.append(nn.functional.mse_loss(img_patches, style_patches[:,nearest_neighbours]))
+		return sum(losses)

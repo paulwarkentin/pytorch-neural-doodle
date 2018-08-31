@@ -82,7 +82,7 @@ def parse_arguments():
 	)
 	parser.add_argument(
 		"--num-phases",
-		default = 3,
+		default = 150,
 		type = exclusive_positive_int_type,
 		required = False,
 		help = "The number of phases to process."

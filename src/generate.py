@@ -19,13 +19,12 @@ import torch
 
 from utils.common.files import get_full_path
 from utils.common.logging import logging_info
-from utils.image import load
+from utils import image
 from utils.common.terminal import query_yes_no
 from cli import parse_arguments
 
 from models import VGG19
 from loss import StyleLoss
-
 
 if __name__ == "__main__":
 	arguments = parse_arguments()
@@ -64,25 +63,40 @@ if __name__ == "__main__":
 	model.to(device)
 
 	# load input data
-	input_style = load(arguments.input_style_file, device=device)
-	input_map   = load(arguments.input_map_file,   device=device)
-	output_map  = load(arguments.output_map_file,  device=device)
-	#output_content = load(arguments.output_content_file)
+	input_style = image.load(arguments.input_style_file, device=device)
+	input_map   = image.load(arguments.input_map_file,   device=device)
+	output_map  = image.load(arguments.output_map_file,  device=device)
+	#output_content = image.load(arguments.output_content_file, device=device)
 
-	# perform forward pass of model to extract response for content loss
+	# setup output image
+	target = torch.autograd.Variable(torch.zeros_like(input_style), requires_grad=True)
+
+	# perform forward pass of model to extract response for loss
+	style_response = model.forward(input_style, extract_layers=arguments.style_layers)
 	#content_response = model.forward(output_content)
 
-	# perform forward pass of model to extract response for style loss
-	style_response = model.forward(input_style, extract_layers=arguments.style_layers)
+	# initialize loss
+	style_loss = StyleLoss(
+		style_response,
+		input_map,
+		output_map,
+		arguments.style_layers,
+		arguments.map_channel_weight,
+		stride=12
+	)
+	#content_loss = ContentLoss()
 
-	# initialize style loss
-	style_loss = StyleLoss(style_response, arguments.style_layers, stride=12)
-
-	# TEST:
-	activations = model.forward(input_map, extract_layers=arguments.style_layers)
-
-	style_loss.loss(activations)
+	# setup optimizer
+	optimizer = torch.optim.LBFGS([target])
 
 	# main loop
 	for ii in range(arguments.num_phases):
-		pass
+		optimizer.zero_grad()
+		activations = model.forward(target, extract_layers=arguments.style_layers)
+		loss = style_loss.loss(activations)
+		loss.backward(retain_graph=True)
+		loss_val = optimizer.step(lambda: loss)
+		print(ii, loss_val.item())
+
+	# write output to disk
+	image.save(arguments.output_file, target.detach().cpu())
