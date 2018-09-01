@@ -6,7 +6,7 @@
 ##
 
 import argparse
-from utils.arguments import positive_float_type, exclusive_positive_int_type
+from utils.arguments import positive_float_type, exclusive_positive_int_type, positive_int_type
 
 def parse_arguments():
 	"""Parse CLI arguments.
@@ -93,6 +93,13 @@ def parse_arguments():
 		type = positive_float_type,
 		required = False,
 		help = "Weight for map channels (gamma)."
+	)
+	parser.add_argument(
+		"--plot-interval",
+		default = None,
+		type = positive_int_type,
+		required = False,
+		help = "Iteration interval for live plot update."
 	)
 	arguments = parser.parse_args()
 	return arguments

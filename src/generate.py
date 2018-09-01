@@ -20,6 +20,7 @@ import torch
 from utils.common.files import get_full_path
 from utils.common.logging import logging_info
 from utils import image
+from utils import plot
 from utils.common.terminal import query_yes_no
 from cli import parse_arguments
 
@@ -82,12 +83,17 @@ if __name__ == "__main__":
 		output_map,
 		arguments.style_layers,
 		arguments.map_channel_weight,
-		stride=12
+		stride=1
 	)
 	#content_loss = ContentLoss()
 
 	# setup optimizer
 	optimizer = torch.optim.LBFGS([target])
+
+	if arguments.plot_interval != None:
+		# setup live plot
+		_, _, height, width = input_style.size()
+		live_plot = plot.LivePlot(width, height)
 
 	# main loop
 	for ii in range(arguments.num_phases):
@@ -97,6 +103,11 @@ if __name__ == "__main__":
 		loss.backward(retain_graph=True)
 		loss_val = optimizer.step(lambda: loss)
 		print(ii, loss_val.item())
+
+		# update live plot
+		if arguments.plot_interval != None:
+			if ii % arguments.plot_interval == 0:
+				live_plot.update(target)
 
 	# write output to disk
 	image.save(arguments.output_file, target.detach().cpu())

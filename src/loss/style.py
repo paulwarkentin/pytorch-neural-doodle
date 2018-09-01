@@ -2,7 +2,7 @@
 ## pytorch-neural-doodle/src/loss/style.py
 ##
 ## Created by Bastian Boll <mail@bbboll.com> on 29/08/2018.
-## Created by Bastian Boll <mail@bbboll.com> on 29/08/2018.
+## Created by Bastian Boll <mail@bbboll.com> on 01/09/2018.
 
 import os.path
 import sys
@@ -74,7 +74,7 @@ class StyleLoss(nn.Module):
 		"""Compute loss of given image w.r.t. initialized style.
 
 		Arguments:
-			model_response (tensor): Model response to image.
+			model_response (tensor): Model response to target image.
 		"""
 		losses = []
 		for l in self.layers:
@@ -85,6 +85,8 @@ class StyleLoss(nn.Module):
 			img_patches = model_response["conv{}".format(l)]
 			img_patches = torch.cat((img_patches, output_map), dim=1)
 			img_patches = torch.squeeze(self.unfold(img_patches))
+
+			#print(img_patches.size())
 
 			# compute nearest neighbours
 			similarity_matrix = img_patches.t() @ style_patches

@@ -42,5 +42,5 @@ def save(filepath, image):
 	image = image.numpy()
 	_, channels, height, width = image.shape
 	image = image.reshape((channels, height, width)).transpose((1,2,0))
-	image = (image + 1.0)*256
+	image = (image + 1.0)*(256/2)
 	io.imsave(filepath, image.astype('uint8'))
