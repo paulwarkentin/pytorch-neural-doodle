@@ -71,6 +71,7 @@ if __name__ == "__main__":
 
 	# setup output image
 	target = torch.autograd.Variable(torch.zeros_like(input_style), requires_grad=True)
+	#target = torch.autograd.Variable(output_map, requires_grad=True)
 
 	# perform forward pass of model to extract response for loss
 	style_response = model.forward(input_style, extract_layers=arguments.style_layers)
@@ -88,7 +89,7 @@ if __name__ == "__main__":
 	#content_loss = ContentLoss()
 
 	# setup optimizer
-	optimizer = torch.optim.LBFGS([target])
+	optimizer = torch.optim.LBFGS([target], lr=1.0)
 
 	if arguments.plot_interval != None:
 		# setup live plot
@@ -110,4 +111,4 @@ if __name__ == "__main__":
 				live_plot.update(target)
 
 	# write output to disk
-	image.save(arguments.output_file, target.detach().cpu())
+	image.save(arguments.output_file, target)

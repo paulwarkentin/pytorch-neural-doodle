@@ -6,7 +6,7 @@
 ##
 
 import argparse
-from utils.arguments import positive_float_type, exclusive_positive_int_type, positive_int_type
+from utils.arguments import positive_float_type, exclusive_positive_int_type, positive_int_type_or_none
 
 def parse_arguments():
 	"""Parse CLI arguments.
@@ -97,7 +97,7 @@ def parse_arguments():
 	parser.add_argument(
 		"--plot-interval",
 		default = None,
-		type = positive_int_type,
+		type = positive_int_type_or_none,
 		required = False,
 		help = "Iteration interval for live plot update."
 	)

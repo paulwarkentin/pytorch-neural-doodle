@@ -2,7 +2,7 @@
 ## pytorch-neural-doodle/src/utils/arguments.py
 ##
 ## Created by Paul Warkentin <paul@warkentin.email> on 05/08/2018.
-## Created by Paul Warkentin <paul@warkentin.email> on 16/08/2018.
+## Created by Bastian Boll <mail@bbboll.com> on 01/09/2018.
 ##
 
 import argparse
@@ -57,6 +57,22 @@ def positive_int_type(arg):
 	Returns:
 		Argument of valid type.
 	"""
+	arg_int = int(arg)
+	if arg_int < 0:
+		raise argparse.ArgumentTypeError("invalid positive_int_type value: '{}', must be positive".format(arg))
+	return arg_int
+
+def positive_int_type_or_none(arg):
+	"""Check an argument for a positive integer type or None.
+
+	Arguments:
+		arg: Argument value.
+
+	Returns:
+		Argument of valid type.
+	"""
+	if arg == 'None':
+		return None
 	arg_int = int(arg)
 	if arg_int < 0:
 		raise argparse.ArgumentTypeError("invalid positive_int_type value: '{}', must be positive".format(arg))

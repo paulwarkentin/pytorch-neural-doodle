@@ -52,6 +52,7 @@ class StyleLoss(nn.Module):
 		for layer in layers:
 			style_resp = style_response["conv{}".format(layer)]
 			patch_height = style_resp.size()[2]
+			channel_count = style_resp.size()[0]
 
 			# downsample style maps
 			down = int(style_map.size()[2] / patch_height)
@@ -59,14 +60,14 @@ class StyleLoss(nn.Module):
 			output_map_down = nn.AvgPool2d((down, down))(output_map)
 
 			# unfold style response
-			style_resp = torch.cat((style_resp, map_channel_weight*output_map_down), dim=1)
+			style_resp = torch.cat((style_resp, map_channel_weight*style_map_down*channel_count), dim=1)
 			style_patches = torch.squeeze(self.unfold(style_resp))
 
 			# compute normalizer for cosine distance
 			style_normalizer = torch.reciprocal(torch.norm(style_patches, p=2, dim=0))
 
 			setattr(self, "style_patches{}".format(layer), style_patches)
-			setattr(self, "output_maps{}".format(layer), map_channel_weight*output_map_down)
+			setattr(self, "output_maps{}".format(layer), map_channel_weight*output_map_down*channel_count)
 			setattr(self, "style_normalizer{}".format(layer), style_normalizer)
 
 	
@@ -86,15 +87,13 @@ class StyleLoss(nn.Module):
 			img_patches = torch.cat((img_patches, output_map), dim=1)
 			img_patches = torch.squeeze(self.unfold(img_patches))
 
-			#print(img_patches.size())
-
 			# compute nearest neighbours
 			similarity_matrix = img_patches.t() @ style_patches
 			img_normalizer = torch.reciprocal(torch.norm(img_patches, p=2, dim=0))
 			style_normalizer = getattr(self, "style_normalizer{}".format(l))
 			similarity_matrix = img_normalizer.expand(patch_count, patch_count) * similarity_matrix 
 			similarity_matrix = similarity_matrix.t() * style_normalizer.expand(patch_count, patch_count)
-			nearest_neighbours = torch.argmax(similarity_matrix, dim=0)
+			nearest_neighbours = torch.argmax(similarity_matrix, dim=1)
 			
 			# free up some memory
 			del similarity_matrix
