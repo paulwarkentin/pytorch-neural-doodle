@@ -2,7 +2,7 @@
 ## pytorch-neural-doodle/src/generate.py
 ##
 ## Created by Paul Warkentin <paul@warkentin.email> on 10/08/2018.
-## Updated by Bastian Boll <mail@bbboll.com> on 31/08/2018.
+## Updated by Bastian Boll <mail@bbboll.com> on 02/09/2018.
 ##
 
 import numpy as np

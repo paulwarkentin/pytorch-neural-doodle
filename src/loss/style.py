@@ -2,7 +2,7 @@
 ## pytorch-neural-doodle/src/loss/style.py
 ##
 ## Created by Bastian Boll <mail@bbboll.com> on 29/08/2018.
-## Created by Bastian Boll <mail@bbboll.com> on 01/09/2018.
+## Created by Bastian Boll <mail@bbboll.com> on 02/09//2018.
 
 import os.path
 import sys
@@ -91,8 +91,8 @@ class StyleLoss(nn.Module):
 			similarity_matrix = img_patches.t() @ style_patches
 			img_normalizer = torch.reciprocal(torch.norm(img_patches, p=2, dim=0))
 			style_normalizer = getattr(self, "style_normalizer{}".format(l))
-			similarity_matrix = img_normalizer.expand(patch_count, patch_count) * similarity_matrix 
-			similarity_matrix = similarity_matrix.t() * style_normalizer.expand(patch_count, patch_count)
+			similarity_matrix = style_normalizer.expand(patch_count, patch_count) * similarity_matrix 
+			similarity_matrix = img_normalizer.expand(patch_count, patch_count).t() * similarity_matrix
 			nearest_neighbours = torch.argmax(similarity_matrix, dim=1)
 			
 			# free up some memory
