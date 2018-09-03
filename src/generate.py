@@ -25,7 +25,7 @@ from utils.common.terminal import query_yes_no
 from cli import parse_arguments
 
 from models import VGG19
-from loss import StyleLoss
+from loss import StyleLoss, ContentLoss
 
 if __name__ == "__main__":
 	arguments = parse_arguments()
@@ -63,19 +63,28 @@ if __name__ == "__main__":
 	model.initialize(vgg_19_path)
 	model.to(device)
 
+	# setup extraction layer lists
+	extract_layers = arguments.style_layers
+	extract_layers.extend(arguments.content_layers)
+
 	# load input data
-	input_style = image.load(arguments.input_style_file, device=device)
-	input_map   = image.load(arguments.input_map_file,   device=device)
-	output_map  = image.load(arguments.output_map_file,  device=device)
-	#output_content = image.load(arguments.output_content_file, device=device)
+	input_style    = image.load(arguments.input_style_file,    device=device)
+	input_map      = image.load(arguments.input_map_file,      device=device)
+	output_map     = image.load(arguments.output_map_file,     device=device)
+	output_content = image.load(arguments.output_content_file, device=device)
+
+	# remove alpha channel if present
+	input_style     = input_style[:,:3,:,:]
+	input_map       = input_map[:,:3,:,:]
+	output_map      = output_map[:,:3,:,:]
+	output_content  = output_content[:,:3,:,:]
 
 	# setup output image
 	target = torch.autograd.Variable(torch.zeros_like(input_style), requires_grad=True)
-	#target = torch.autograd.Variable(output_map, requires_grad=True)
 
 	# perform forward pass of model to extract response for loss
-	style_response = model.forward(input_style, extract_layers=arguments.style_layers)
-	#content_response = model.forward(output_content)
+	style_response   = model.forward(input_style,    extract_layers=arguments.style_layers)
+	content_response = model.forward(output_content, extract_layers=arguments.content_layers)
 
 	# initialize loss
 	style_loss = StyleLoss(
@@ -86,10 +95,13 @@ if __name__ == "__main__":
 		arguments.map_channel_weight,
 		stride=1
 	)
-	#content_loss = ContentLoss()
+	content_loss = ContentLoss(
+		content_response,
+		arguments.content_layers
+	)
 
 	# setup optimizer
-	optimizer = torch.optim.LBFGS([target], lr=1.0)
+	optimizer = torch.optim.LBFGS([target], lr=1.0, history_size=100)
 
 	if arguments.plot_interval != None:
 		# setup live plot
@@ -99,8 +111,8 @@ if __name__ == "__main__":
 	# main loop
 	for ii in range(arguments.num_phases):
 		optimizer.zero_grad()
-		activations = model.forward(target, extract_layers=arguments.style_layers)
-		loss = style_loss.loss(activations)
+		activations = model.forward(target, extract_layers=extract_layers)
+		loss = arguments.style_weight*style_loss.loss(activations) + arguments.content_weight*content_loss.loss(activations)
 		loss.backward(retain_graph=True)
 		loss_val = optimizer.step(lambda: loss)
 		print(ii, loss_val.item())

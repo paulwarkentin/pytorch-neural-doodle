@@ -24,13 +24,27 @@ class ContentLoss(nn.Module):
 	(https://arxiv.org/pdf/1508.06576.pdf).
 
 	Attributes:
-		-
+		content_response{}  Model response of content image for all layers.
 	"""
 
-	def __init__(self, content):
+	def __init__(self, content_response, layers):
 		"""
 		"""
 		super().__init__()
+		self.layers = layers
+		for layer in layers:
+			content_resp = content_response["conv{}".format(layer)]
+			setattr(self, "content_response{}".format(layer), content_resp)
 
+	def loss(self, model_response):
+		"""Compute loss of given image w.r.t. initialized content.
 
-		
+		Arguments:
+			model_response (tensor): Model response to target image.
+		"""
+		losses = []
+		for l in self.layers:
+			content_response = getattr(self, "content_response{}".format(l))
+			target_response = model_response["conv{}".format(l)]
+			losses.append(nn.functional.mse_loss(content_response, target_response))
+		return sum(losses)
