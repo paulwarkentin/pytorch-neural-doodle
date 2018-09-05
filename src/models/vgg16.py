@@ -1,8 +1,8 @@
 ##
-## pytorch-neural-doodle/src/models/vgg19.py
+## pytorch-neural-doodle/src/models/vgg16.py
 ##
-## Created by Paul Warkentin <paul@warkentin.email> on 08/08/2018.
-## Updated by Bastian Boll <mail@bbboll.com> on 31/08/2018.
+## Created by Bastian Boll <mail@bbboll.com> on 05/09/2018.
+## Updated by Bastian Boll <mail@bbboll.com> on 05/09/2018.
 ##
 
 import pickle
@@ -18,15 +18,15 @@ while os.path.basename(__exec_dir) != "src":
 	sys.path.insert(0, __exec_dir)
 
 
-class VGG19(nn.Module):
-	"""A PyTorch module that implements the VGG 19 network for image classification.
+class VGG16(nn.Module):
+	"""A PyTorch module that implements the VGG 16 network for image classification.
 
-	For information on the VGG 19 network see Simonyan & Zisserman
+	For information on the VGG 16 network see Simonyan & Zisserman
 	"Very Deep Convolutional Networks for Large-Scale Image Recognition"
 	(https://arxiv.org/abs/1409.1556).
 
 	Attributes:
-		conv{x}_{y}: Convolutional modules of the VGG 19 network.
+		conv{x}_{y}: Convolutional modules of the VGG 16 network.
 		pool:        Pooling module.
 		relu:        ReLU activation module.
 		map{x}:      Pooling modules for the style image.
@@ -50,17 +50,14 @@ class VGG19(nn.Module):
 		self.conv3_1 = nn.Conv2d(128, 256, 3, padding=1)
 		self.conv3_2 = nn.Conv2d(256, 256, 3, padding=1)
 		self.conv3_3 = nn.Conv2d(256, 256, 3, padding=1)
-		self.conv3_4 = nn.Conv2d(256, 256, 3, padding=1)
 
 		self.conv4_1 = nn.Conv2d(256, 512, 3, padding=1)
 		self.conv4_2 = nn.Conv2d(512, 512, 3, padding=1)
 		self.conv4_3 = nn.Conv2d(512, 512, 3, padding=1)
-		self.conv4_4 = nn.Conv2d(512, 512, 3, padding=1)
 
 		self.conv5_1 = nn.Conv2d(512, 512, 3, padding=1)
 		self.conv5_2 = nn.Conv2d(512, 512, 3, padding=1)
 		self.conv5_3 = nn.Conv2d(512, 512, 3, padding=1)
-		self.conv5_4 = nn.Conv2d(512, 512, 3, padding=1)
 
 		self.pool = nn.MaxPool2d(2, stride=2)
 		self.relu = nn.ReLU()
@@ -80,21 +77,18 @@ class VGG19(nn.Module):
 		self.nn3_1 = nn.Conv2d(256, 1, 3)
 		self.nn3_2 = nn.Conv2d(256, 1, 3)
 		self.nn3_3 = nn.Conv2d(256, 1, 3)
-		self.nn3_4 = nn.Conv2d(256, 1, 3)
 
 		self.nn4_1 = nn.Conv2d(512, 1, 3)
 		self.nn4_2 = nn.Conv2d(512, 1, 3)
 		self.nn4_3 = nn.Conv2d(512, 1, 3)
-		self.nn4_4 = nn.Conv2d(512, 1, 3)
 
 		self.nn5_1 = nn.Conv2d(512, 1, 3)
 		self.nn5_2 = nn.Conv2d(512, 1, 3)
 		self.nn5_3 = nn.Conv2d(512, 1, 3)
-		self.nn5_4 = nn.Conv2d(512, 1, 3)
 
 
 	def initialize(self, filename):
-		"""Load and initialize weights and biases of the VGG 19 network.
+		"""Load and initialize weights and biases of the VGG 16 network.
 
 		Arguments:
 			filename (str): Filename of the file containing the weights and biases.
@@ -110,7 +104,7 @@ class VGG19(nn.Module):
 			module.bias.data = torch.from_numpy(data[name][1]).double()
 
 
-	def forward(self, image_input, extract_layers=["5_4"]):
+	def forward(self, image_input, extract_layers=["out"]):
 		"""Do forward pass of the network.
 
 		Arguments:
@@ -122,7 +116,7 @@ class VGG19(nn.Module):
 		outputs = {}
 
 		x = image_input
-		for block_ii, num_convs in enumerate([2, 2, 4, 4, 4]):
+		for block_ii, num_convs in enumerate([2, 2, 3, 3, 3]):
 			conv_block_name = "conv{}".format(block_ii + 1)
 			nn_block_name = "nn{}".format(block_ii + 1)
 
@@ -135,5 +129,8 @@ class VGG19(nn.Module):
 					outputs[conv_name] = x
 
 			x = self.pool(x)
+		
+		if "out" in extract_layers:
+			outputs["out"] = x
 		
 		return outputs
