@@ -2,13 +2,24 @@
 %% pytorch-neural-doodle/docs/content/chapters/introduction.tex
 %%
 %% Created by Paul Warkentin <paul@warkentin.email> on 21/08/2018.
-%% Updated by Bastian Boll <mail@bbboll.com> on 28/08/2018.
+%% Updated by Bastian Boll <mail@bbboll.com> on 02/10/2018.
 %%
 
 \section{Introduction}
 \label{section:introduction}
 
-In light of meaningful advances in the field of image classification using convolutional neural networks (CNNs) \cite{vgg2014}, interest has been sparked to exploit the inverse process for image generation. Because the intrinsic dimension of the input image space \(I\) is generally much larger than the intrinsic dimension of the label space \(L\), a CNN is not canonically a bijective mapping. The inverse process can therefore be seen as selecting an element \(x\) of the preimage \(\mathrm{CNN}^{-1}(y)\) for a fixed label \(y\in L\) such that a measure of visual or artistic appeal is maximized.
+% TODO: what exactly is style transfer anyway?
+
+In light of meaningful advances in the field of image classification using convolutional neural networks (CNNs) \cite{vgg2014}, interest has been sparked to exploit the inverse process for image generation. Because the intrinsic dimension of the input image space \(I\) is generally much larger than the intrinsic dimension of the label space \(L\), such a CNN cannot canonically be a bijective mapping. The inverse process can therefore be seen as selecting an element \(x\) of the preimage \(\mathrm{CNN}^{-1}(y)\) for a fixed label \(y\in L\) such that a measure of visual or artistic appeal is maximized.
+
+For the purpose of a more fine-grained analysis of this process, suppose a given network which is discriminatively trained for object classification. Let \(L_i\) denote the feature space of said network at layer \(i\). The network can be characterized as functions \(\text{net}_i\colon I \to L_i\) which encode a given input image into the feature space \(L_i\). Sampling the preimage \(\text{net}_i^{-1}(y_i)\) of a given feature vector \(y_i\in L_i\) can serve to visuallize the way in which such networks extract features from the input image. One can observe that the lower levels of the network capture mostly local texture information while higher levels encode more abstract information about the objects visible in the input image.
+
+% Leveraging encoding into these feature spaces for style transfer requires the combination of two general fields of expertise: style / texture and content.
+
+In texture generation, a related area of research, efforts have been made to characterize texture as image statistics \cite{julesz1962visual,heeger1995pyramid,rosenholtz2012summary}. Given a textured image, one can generate a different image which human observers percept to contain the same texture. This is done by looking for an image that reproduces the respective image statistics. However, careful hand-crafting of such image statistics is inherently limited and the results still fall short of being able to reproduce the full range of natural texture. In 2015, Gatys et al \cite{gatys2015texture} proposed using the feature encoding in lower levels of a VGG19 network \cite{vgg2014} to provide the image statistics needed to capture texture. Training the network to classify objects also results in functions \(\text{net}_i\) which encode low level image statistics such as texture. 
+
+In the same year, Gatys et al also introduced a precise formulation of artistic style transfer as reproducing a given content image using texture from a different style image \cite{gatys2015neural}. They achieve very convincing results by constructing an image which reproduces the low level texture statistics of the style image while also reproducing higher level statistics of the content image.
+%More specifically 
 
 % classification breakthrough progress
 % generation of images using CNNs
