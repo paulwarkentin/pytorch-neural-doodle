@@ -39,8 +39,8 @@ def save(filepath, image):
 		filepath (string): Path to save to.
 		image (tensor):    Image to be saved.
 	"""
-	image = image.numpy()
+	image = image.detach().cpu().numpy()
 	_, channels, height, width = image.shape
 	image = image.reshape((channels, height, width)).transpose((1,2,0))
-	image = (image + 1.0)*256
+	image = (image + 1.0)*(256/2)
 	io.imsave(filepath, image.astype('uint8'))
