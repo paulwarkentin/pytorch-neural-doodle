@@ -37,30 +37,25 @@ Investigating the motivation behind the Gram matrix representation and loss func
 where \(\text{KL}(\cdot)\) denotes the Kullback-Leibler divergence. This in turn yields the solution
 \[\Sigma^\ast = \mathbb{E}_{x\sim P} \,x^Tx\]
 Because the true distribution \(P\) is not obtainable, we instead fit \(Q\) to the data by replacing the above with the empirical covariance and obtain
-\[\Sigma^\ast \approx \frac{1}{M^2N^2} \sum_{jk} G_{jk}\]
+\[\Sigma^\ast \approx \frac{1}{MN} \sum_{jk} G_{jk}\]
 for the respective layer of the network. In fact, Gatys et al. use a slightly different normalization constant, but we find this derivation to be more convincing.
 
 Choosing a weighting factor \(\alpha\) yields the full loss function for artistic style transfer as 
 \[\mathcal{L} = \mathcal{L}_\text{c}+\alpha \mathcal{L}_\text{s}\]
 
-Because the Gram matrices describe global correlations between feature activations as detailed above, they do not retain local features of the texture at hand. This presents a problem for artistic style transfer, as local glitches in the generated image can hardly be addressed. As an alternative approach, one can define a patch based style loss function \cite{mrf2016} which respects local pixel statistics. 
+Because the Gram matrices describe global correlations between feature activations as detailed above, they do not retain local features of the texture at hand. This presents a problem for artistic style transfer, as local glitches in the generated image can hardly be addressed. As an alternative approach, one can define a patch based style loss function \cite{mrf2016} which respects local pixel statistics. Let \(\Psi(x)\) denote the list of all \(k\times k\) patches of the activations for the input image \(x\) at a given layer of the network. We can define a style loss function as
+\[\mathcal{L}_{s,p}(x,p) = \sum_i \|\Psi_i(x)-\Psi_{\text{NN}(i)}(p)\|_2^2\]
+where \(\text{NN}(i)\) refers to the index of the nearest neighbour patch of \(\Psi_i(x)\) in the set of patches \(\Psi(p)\) with respect to normalized cross-correlation
+\[\text{NN}(i) = \arg\min_{j} \frac{\Psi_i(x)\cdot \Psi_j(p)}{\|\Psi_i(x)\|\|\Psi_j(p)\|}\]
+Using a patch-based style loss reduces the overall number of glitches in the generated image, as the algorithm respects local pixel statistics and is not exclusively guided by global correlations.
 
-We initialize \(x\) to contain white noise. 
+Having defined and explored the problem domain of artistic style transfer, subsequent work focuses on more practical and artistic aspects. While the number of glitches can and should be reduced by the means described above, one can certainly see the point of wanting to interact with the algorithm at work. Opening up hooks for interactive input from a user can potentially turn this algorithm into an artistic tool which can be led by human intuition. In this vein, Champandard proposes using semantic segmentation maps of both input style and content images \cite{doodles2016}. The following main part of the present paper focuses on how to implement this approach.
 
-% Gram matrices: Global nature. vs patches, local understanding
+
+%We initialize \(x\) to contain white noise. 
 
 % Artistic control: lack of semantic segmentation, artifacts
 
-% Statistics are computed from activations of layers in a pre-trained classification network. Gram matrices, empirical correlation
-% glitches due to lack of semantic segmentation 
-% incorporate user provided (segmantation / semantic map / doodle) into style transfer
-% this also gives user artistic control
 % interactive nature of the algorithm renders skillful creation of neural doodles necessary
 
-% Progression of this field seems to go like:
-% 1. CNN for classification
-% 2. CNN for generating images (especially the VGG architecture 2014)
-% 3. Gatys et al. introduce formulation of style transfer and respective content loss function (Gram matrices, global empirical correlation)
-% 4. Patch based approaches are introduced as means of more precisely capturing local pixel statistics
-% 5. Champandard builds on the patch based approach to incorporate user input in the form of semantic segmentation maps (neural doodles) 
 % 6. Ulyanov et al (2016) introduce an alternative approach based on texture synthesis which mitigates computational cost and memory requirements necessary in the architectures above. This is claimed to yield similar results 500x faster and using an order of magnitude less memory. (see this blog post: https://dmitryulyanov.github.io/feed-forward-neural-doodle/). This is done by exploring the feasible set of images using a generative neural network instead of a classical optimization algorithm (Gatys uses L-BFGS). He also gives a much more convincing statistical motivation for the loss construction and his approach seems to otherwise be mostly orthogonal to the concepts introduced above.
