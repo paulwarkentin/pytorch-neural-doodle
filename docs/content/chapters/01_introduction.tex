@@ -16,13 +16,40 @@ For the purpose of a more fine-grained analysis of this process, suppose a given
 
 % MAYBE: Leveraging encoding into these feature spaces for style transfer requires the combination of two general fields of expertise: style / texture and content.
 
-In texture generation, a related area of research, efforts have been made to characterize texture as image statistics \cite{julesz1962visual,heeger1995pyramid,rosenholtz2012summary}. Given a textured image, one can generate a different image which human observers percept to contain the same texture. This is done by looking for an image that reproduces the respective image statistics. However, careful hand-crafting of such image statistics is inherently limited and the results still fall short of being able to reproduce the full range of natural texture. In 2015, Gatys et al \cite{gatys2015texture} proposed using the feature encoding in lower levels of a VGG19 network \cite{vgg2014} to provide the image statistics needed to capture texture. Training the network to classify objects also results in functions \(\text{net}_i\) which encode low level image statistics such as texture. 
+In texture generation, a related area of research, efforts have been made to characterize texture as image statistics \cite{julesz1962visual,heeger1995pyramid,rosenholtz2012summary}. Given a textured image, one can generate a different image which human observers percept to contain the same texture. This is done by looking for an image that reproduces the respective image statistics. However, careful hand-crafting of such image statistics is inherently limited and the results still fall short of being able to reproduce the full range of natural texture. In 2015, Gatys et al. \cite{gatys2015texture} proposed using the feature encoding in lower levels of a VGG19 network \cite{vgg2014} to provide the image statistics needed to capture texture. Training the network to classify objects also results in functions \(\text{net}_i\) which encode low level image statistics such as texture. This new approach has had a large impact on the still young field of texture synthesis.
 
 % TODO: reference to early visual system as motivation for the following
 
-In the same year, Gatys et al also introduced a precise formulation of artistic style transfer as reproducing a given content image using texture from a different style image \cite{gatys2015neural}. They achieve very convincing results by constructing an image which reproduces the low level texture statistics of the style image while also reproducing higher level statistics of the content image.
+In the same year, Gatys et al. also introduced a precise formulation of artistic style transfer as reproducing a given content image using texture from a different style image \cite{gatys2015neural}. They achieve very convincing results by constructing an image which reproduces the low level texture statistics of the style image while also reproducing higher level statistics of the content image. 
+This requires an optimization process during which a target image is constructed to minimize a combined style- and content loss function.
+Let \(p\) denote the original (content) image and \(x\) denote the target image to be generated. 
+Consider the activations \(P^i\in \R^{M_i\times N_i}\) and \(F^i\in \R^{M_i\times N_i}\) at layer \(i\) of the VGG network for the original image \(p\) and the target image \(x\) respectively.
+The content loss is defined by Gatys et al. as a simple mean squared error loss between the activations of the content image and the target image.
+\[\mathcal{L}_\text{c}(p,x,i) = \frac{1}{2}\sum_{j,k} (F^i_{jk}-P^i_{jk})^2\]
+On the other hand the style loss as described in \cite{gatys2015texture} requires further preparation. We define Gram matrices \(G^i\in \R^{M_i\times M_i}\) through
+\[G^i_{jk} = \sum_n F^i_{jn}F^i_{kn}\]
+and set the style loss to be 
+\[\mathcal{L}_\text{s} = \sum_i \frac{w_i}{M_i^2N_i^2} \sum_{jk} (G^i_{jk}-\hat G^i_{jk})^2\]
+Here, \(G^i\) refers to the Gram matrix computed from the activations of the target image and \(\hat G^i\) to those for the style image. The weights \(w_i\) are adjusted to pronounce activations in lower network layers. In practice, many of these weights will be set to zero in order to save computational effort.
 
-% Gram matrices
+Investigating the motivation behind the Gram matrix representation and loss function construction\footnote{This is detailed in a supplementary blog post to the paper \cite{ulyanov2016texture}: \url{https://dmitryulyanov.github.io/feed-forward-neural-doodle/}}, one can assume the activations \(F^i\) to follow an unknown true distribution \(P\). Choosing a Gaussian distribution with zero mean \(Q\sim \mathcal{N}(0,\Sigma)\) as a model, we can compute the information projection
+\[\Sigma^\ast = \arg\min_\Sigma \text{KL}(P||Q)\]
+where \(\text{KL}(\cdot)\) denotes the Kullback-Leibler divergence. This in turn yields the solution
+\[\Sigma^\ast = \mathbb{E}_{x\sim P} \,x^Tx\]
+Because the true distribution \(P\) is not obtainable, we instead fit \(Q\) to the data by replacing the above with the empirical covariance and obtain
+\[\Sigma^\ast \approx \frac{1}{M^2N^2} \sum_{jk} G_{jk}\]
+for the respective layer of the network. In fact, Gatys et al. use a slightly different normalization constant, but we find this derivation to be more convincing.
+
+Choosing a weighting factor \(\alpha\) yields the full loss function for artistic style transfer as 
+\[\mathcal{L} = \mathcal{L}_\text{c}+\alpha \mathcal{L}_\text{s}\]
+
+Because the Gram matrices describe global correlations between feature activations as detailed above, they do not retain local features of the texture at hand. This presents a problem for artistic style transfer, as local glitches in the generated image can hardly be addressed. As an alternative approach, one can define a patch based style loss function \cite{mrf2016} which respects local pixel statistics. 
+
+We initialize \(x\) to contain white noise. 
+
+% Gram matrices: Global nature. vs patches, local understanding
+
+% Artistic control: lack of semantic segmentation, artifacts
 
 % Statistics are computed from activations of layers in a pre-trained classification network. Gram matrices, empirical correlation
 % glitches due to lack of semantic segmentation 
@@ -33,7 +60,7 @@ In the same year, Gatys et al also introduced a precise formulation of artistic 
 % Progression of this field seems to go like:
 % 1. CNN for classification
 % 2. CNN for generating images (especially the VGG architecture 2014)
-% 3. Gatys et al introduce formulation of style transfer and respective content loss function (Gram matrices, global empirical correlation)
+% 3. Gatys et al. introduce formulation of style transfer and respective content loss function (Gram matrices, global empirical correlation)
 % 4. Patch based approaches are introduced as means of more precisely capturing local pixel statistics
 % 5. Champandard builds on the patch based approach to incorporate user input in the form of semantic segmentation maps (neural doodles) 
 % 6. Ulyanov et al (2016) introduce an alternative approach based on texture synthesis which mitigates computational cost and memory requirements necessary in the architectures above. This is claimed to yield similar results 500x faster and using an order of magnitude less memory. (see this blog post: https://dmitryulyanov.github.io/feed-forward-neural-doodle/). This is done by exploring the feasible set of images using a generative neural network instead of a classical optimization algorithm (Gatys uses L-BFGS). He also gives a much more convincing statistical motivation for the loss construction and his approach seems to otherwise be mostly orthogonal to the concepts introduced above.
