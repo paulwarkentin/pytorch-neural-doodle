@@ -19,7 +19,7 @@ import torch.nn as nn
 class StyleLoss(nn.Module):
 	"""A PyTorch module that implements loss w.r.t. style for style transfer.
 
-	For information on this loss function, refer to the documentation 
+	For information on this loss function, refer to the documentation
 	in `pytorch-neural-doodle/docs` or to Champandard
 	"Semantic Style Transfer and Turning Two-Bit Doodles into Fine Artwork"
 	(https://arxiv.org/pdf/1603.01768.pdf).
@@ -70,7 +70,7 @@ class StyleLoss(nn.Module):
 			setattr(self, "output_maps{}".format(layer), map_channel_weight*output_map_down*channel_count)
 			setattr(self, "style_normalizer{}".format(layer), style_normalizer)
 
-	
+
 	def loss(self, model_response):
 		"""Compute loss of given image w.r.t. initialized style.
 
@@ -91,10 +91,10 @@ class StyleLoss(nn.Module):
 			similarity_matrix = img_patches.t() @ style_patches
 			img_normalizer = torch.reciprocal(torch.norm(img_patches, p=2, dim=0))
 			style_normalizer = getattr(self, "style_normalizer{}".format(l))
-			similarity_matrix = style_normalizer.expand(patch_count, patch_count) * similarity_matrix 
+			similarity_matrix = style_normalizer.expand(patch_count, patch_count) * similarity_matrix
 			similarity_matrix = img_normalizer.expand(patch_count, patch_count).t() * similarity_matrix
 			nearest_neighbours = torch.argmax(similarity_matrix, dim=1)
-			
+
 			# free up some memory
 			del similarity_matrix
 			del img_normalizer

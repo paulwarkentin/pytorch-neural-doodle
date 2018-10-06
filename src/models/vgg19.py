@@ -135,5 +135,5 @@ class VGG19(nn.Module):
 					outputs[conv_name] = x
 
 			x = self.pool(x)
-		
+
 		return outputs

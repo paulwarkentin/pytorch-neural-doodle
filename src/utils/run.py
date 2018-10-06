@@ -2,7 +2,7 @@
 ## pytorch-neural-doodle/src/utils/run.py
 ##
 ## Created by Paul Warkentin <paul@warkentin.email> on 05/08/2018.
-## Updated by Paul Warkentin <paul@warkentin.email> on 16/08/2018.
+## Updated by Paul Warkentin <paul@warkentin.email> on 06/10/2018.
 ##
 
 import json
@@ -26,8 +26,7 @@ class Run(object):
 		id: Identifier of the run.
 		base_path: Absolute path to the base directory of the run.
 		config_file_path: Absolute path to the configuration file of the run.
-		checkpoints_path: Absolute path to the checkpoints directory.
-		checkpoints_file_path: Absolute path to the checkpoints file.
+		output_path: Absolute path to the output directory.
 		__open: Flag whether the run was opened.
 		__config: Dictionary containing the configuration of the run.
 	"""
@@ -42,8 +41,7 @@ class Run(object):
 
 		self.base_path = None
 		self.config_file_path = None
-		self.checkpoints_path = None
-		self.checkpoints_file_path = None
+		self.output_path = None
 
 		self.__open = False
 		self.__config = None
@@ -83,11 +81,10 @@ class Run(object):
 
 		# create paths
 		self.config_file_path = os.path.join(self.base_path, "config.json")
-		self.checkpoints_path = os.path.join(self.base_path, "checkpoints")
-		self.checkpoints_file_path = os.path.join(self.checkpoints_path, "checkpoints")
+		self.output_path = os.path.join(self.base_path, "output")
 
 		mkdir(self.base_path)
-		mkdir(self.checkpoints_path)
+		mkdir(self.output_path)
 
 		# load or initialize configuration
 		if os.path.isfile(self.config_file_path):

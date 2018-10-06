@@ -2,19 +2,118 @@
 ## pytorch-neural-doodle/src/utils/arguments.py
 ##
 ## Created by Paul Warkentin <paul@warkentin.email> on 05/08/2018.
-## Created by Bastian Boll <mail@bbboll.com> on 01/09/2018.
+## Updated by Paul Warkentin <paul@warkentin.email> on 06/10/2018.
 ##
 
 import argparse
 import os
 import sys
 
-__exec_dir = sys.path[0]
-while os.path.basename(__exec_dir) != "src":
-	__exec_dir = os.path.dirname(__exec_dir)
-	sys.path.insert(0, __exec_dir)
 
-from utils.common.logging import logging_error
+def parse_arguments():
+	"""Parse CLI arguments.
+	"""
+	# parse arguments
+	parser = argparse.ArgumentParser(
+		description = "Semantic Style Transfer after https://arxiv.org/abs/1603.01768."
+	)
+
+	parser.add_argument(
+		"--input-style-file",
+		default = None,
+		type = str,
+		required = True,
+		help = "Path to the input style file."
+	)
+	parser.add_argument(
+		"--input-map-file",
+		default = None,
+		type = str,
+		required = True,
+		help = "Path to the input map file."
+	)
+	parser.add_argument(
+		"--output-map-file",
+		default = None,
+		type = str,
+		required = True,
+		help = "Path to the output map file."
+	)
+	parser.add_argument(
+		"--output-content-file",
+		default = None,
+		type = str,
+		required = False,
+		help = "Path to the content file."
+	)
+	parser.add_argument(
+		"--content-weight",
+		default = 10.0,
+		type = positive_float_type,
+		required = False,
+		help = "Weight of the content relative to the style (alpha)."
+	)
+	parser.add_argument(
+		"--content-layers",
+		nargs = "+",
+		default = ["4_2"],
+		type = positive_float_type,
+		required = False,
+		help = "The layer to use for the content."
+	)
+	parser.add_argument(
+		"--style-layers",
+		nargs = "+",
+		default = ["3_1", "4_1"],
+		type = positive_float_type,
+		required = False,
+		help = "The layer to use for the style."
+	)
+	parser.add_argument(
+		"--style-weight",
+		default = 25.0,
+		type = positive_float_type,
+		required = False,
+		help = "Weight of the style relative to the style (beta)."
+	)
+	parser.add_argument(
+		"--map-channel-weight",
+		default = 50.0,
+		type = positive_float_type,
+		required = False,
+		help = "Weight for map channels (gamma)."
+	)
+	parser.add_argument(
+		"--num-phases",
+		default = 150,
+		type = exclusive_positive_int_type,
+		required = False,
+		help = "The number of phases to process."
+	)
+	parser.add_argument(
+		"--device",
+		default = None,
+		type = str,
+		required = False,
+		help = "Device to train on."
+	)
+	parser.add_argument(
+		"--save-interval",
+		default = None,
+		type = positive_int_type_or_none,
+		required = False,
+		help = "Iteration interval for saving the output."
+	)
+	parser.add_argument(
+		"--plot",
+		default = False,
+		type = bool,
+		required = False,
+		help = "Boolean flag whether to show live plots."
+	)
+
+	arguments = parser.parse_args()
+	return arguments
 
 
 def boolean_type(arg):
