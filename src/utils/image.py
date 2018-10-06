@@ -31,7 +31,7 @@ def load(filepath, device=torch.device("cpu")):
 	if not os.path.isfile(filepath):
 		logging_error("File {} does not exist.".format(filepath), should_exit = True)
 
-	image = io.imread(filepath).transpose((2, 0, 1)) / 256.0 / 2.0 - 1.0
+	image = io.imread(filepath).transpose((2, 0, 1)) / (256.0 / 2.0) - 1.0
 	return torch.from_numpy(image).double().unsqueeze(0).to(device)
 
 
@@ -45,5 +45,5 @@ def save(filepath, image):
 	image = image.detach().cpu().numpy()
 	_, channels, height, width = image.shape
 	image = image.reshape((channels, height, width)).transpose((1, 2, 0))
-	image = (image + 1.0) * 256 / 2
+	image = (image + 1.0) * (256.0 / 2.0)
 	io.imsave(filepath, image.astype("uint8"))

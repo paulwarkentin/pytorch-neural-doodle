@@ -1,9 +1,3 @@
-## RUN
-/run/*
-!/run/.gitkeep
-data/output/*.png
-data/output/*.jpg
-
 ## MODELS
 /models/*
 !/models/.gitkeep

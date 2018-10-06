@@ -1,0 +1,26 @@
+{
+    "files": {
+        "input_style": "data/samples_small/renoir.png",
+        "input_map": "data/samples_small/renoir_style.png",
+        "output_map": "data/samples_small/renoir_out_style.png",
+        "output_content": null
+    },
+    "training": {
+        "content_weight": 10.0,
+        "content_layers": [
+            "4_2"
+        ],
+        "style_layers": [
+            "3_1",
+            "4_1"
+        ],
+        "style_weight": 25.0,
+        "map_channel_weight": 3500.0,
+        "num_phases": 500,
+        "device": "cuda"
+    },
+    "output": {
+        "save_interval": 50,
+        "plot_interval": 5
+    }
+}

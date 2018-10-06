@@ -11,18 +11,22 @@ This project is a research project created in fulfillment of requirements for th
 ```
 .
 ├─ data/
-│  └─ samples/                  <- sample images
+│  │  samples/                  <- sample images
+│  │  samples_small/            <- small sample images
+│  └─ samples_tiny/             <- tiny sample images
 ├─ docs/                        <- project documentation
 ├─ models/                      <- pre-trained weights and frozen models
 │  └─ vgg_19_imagenet/          <- pre-trained VGG 19 weights
-├─ run/                         <- run configurations and saved checkpoints
-│  └─ run_*/                       created by src/train.py
+├─ runs/                        <- run configurations and saved checkpoints
+│  └─ run_*/                       created by src/generated.py
 ├─ src/
+│  ├─ loss/                     <- loss implementation
 │  ├─ models/                   <- model implementation
 │  ├─ utils/                    <- utility functions and classes
 │  │  └─ common/
 │  ├─ extract_vgg_19_weights.py <- extract pre-trained VGG 19 weights
 │  └─ generate.py               <- generate a new image
+├─ Makefile                     <- a Makefile to quickly generate new images
 ├─ LICENSE.md
 └─ README.md
 ```
@@ -31,10 +35,16 @@ This project is a research project created in fulfillment of requirements for th
 
 To get started, download the pre-trained [VGG 19 weights](http://download.tensorflow.org/models/vgg_19_2016_08_28.tar.gz) and extract the file `vgg_19.ckpt` to `pytorch-neural-doodle/models/vgg_19_imagenet`. To extract the minimum weights and biases needed for this project, run the Python script `extract_vgg_19_weights.py`. The compatible file `pytorch-neural-doodle/models/vgg_19_imagenet/vgg_19.minimum.pkl` will be created.
 
+The Makefile in the root directory offers some commands with pre-set parameters.
+
 ## Dependencies
 
 The project was compiled using the following packages:
-- *tbd.*
+- **Matplotlib** 2.2.2 ([Information](https://matplotlib.org/))
+- **NumPy** 1.14.5 ([Information](https://www.numpy.org/))
+- **PyTorch** 0.4.0 ([Information](https://pytorch.org/))
+- **scikit-image** 0.14.0 )[Information](https://scikit-image.org/))
+- **Tensorflow GPU** 1.9.0 ([Information](https://www.tensorflow.org/))
 
 ## LICENSE
 

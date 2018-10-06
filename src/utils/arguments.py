@@ -57,7 +57,7 @@ def parse_arguments():
 		"--content-layers",
 		nargs = "+",
 		default = ["4_2"],
-		type = positive_float_type,
+		type = str,
 		required = False,
 		help = "The layer to use for the content."
 	)
@@ -65,7 +65,7 @@ def parse_arguments():
 		"--style-layers",
 		nargs = "+",
 		default = ["3_1", "4_1"],
-		type = positive_float_type,
+		type = str,
 		required = False,
 		help = "The layer to use for the style."
 	)
@@ -105,11 +105,11 @@ def parse_arguments():
 		help = "Iteration interval for saving the output."
 	)
 	parser.add_argument(
-		"--plot",
+		"--plot-interval",
 		default = False,
-		type = bool,
+		type = positive_int_type_or_none,
 		required = False,
-		help = "Boolean flag whether to show live plots."
+		help = "Iteration interval for showing live plots."
 	)
 
 	arguments = parser.parse_args()

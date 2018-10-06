@@ -77,7 +77,7 @@ if __name__ == "__main__":
 	run.set_config_value(arguments.num_phases, "training", "num_phases")
 	run.set_config_value(arguments.device, "training", "device")
 	run.set_config_value(arguments.save_interval, "output", "save_interval")
-	run.set_config_value(arguments.plot, "output", "plot")
+	run.set_config_value(arguments.plot_interval, "output", "plot_interval")
 	run.save_config()
 
 	# print some information
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 	logging_info("Num phases:          {}".format(arguments.num_phases))
 	logging_info("Device:              {}".format(arguments.device))
 	logging_info("Save interval:       {}".format(arguments.save_interval or "At the end"))
-	logging_info("Plot:                {}".format(arguments.plot))
+	logging_info("Plot interval:       {}".format(arguments.plot_interval))
 
 	# register exit handler
 	atexit.register(exit_handler, run)
@@ -167,9 +167,9 @@ if __name__ == "__main__":
 	optimizer = torch.optim.LBFGS([target], lr=1.0, history_size=100)
 
 	# setup live plot
-	if arguments.save_interval is not None and arguments.plot:
+	if arguments.plot_interval is not None:
 		_, _, height, width = input_style.size()
-		live_plot = plot.LivePlot(width, height)
+		live_plot = LivePlot(width, height)
 
 	logging_info("Start generating the image.")
 
@@ -197,21 +197,20 @@ if __name__ == "__main__":
 
 		t1 = time.time() - t0
 		logging_info("Phase {:d}: Loss = {:f}, Escaped Time = {:.0f}m {:.0f}s".format(
-			phase, loss_val.item(), t1 // 60 % 60, t1 % 60
+			phase, print_loss, t1 // 60 % 60, t1 % 60
 		))
 
-		# update live plot and save output
+		# save output
 		if arguments.save_interval is not None and phase % arguments.save_interval == 0:
-			# save output
 			filepath = os.path.join(
 				run.output_path, "output-{}.png".format(phase)
 			)
 			image.save(filepath, target)
 			logging_info("Output image saved to '{}'.".format(filepath))
 
-			# update live plot
-			if arguments.plot:
-				live_plot.update(target)
+		# update live plot
+		if arguments.plot_interval is not None and phase % arguments.plot_interval == 0:
+			live_plot.update(target)
 
 	# write output to disk
 	filepath = os.path.join(run.output_path, "result.png")
