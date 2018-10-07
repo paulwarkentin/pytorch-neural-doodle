@@ -38,11 +38,11 @@ The parameter \(\gamma\) can be seen as a user control point, specifying how hea
 	\item The algorithm being used is essentially the same as the patch based approach of \cite{mrf2016} because the datastructure being worked on does only change along the channel dimension and the operations being applied remain the same. In the common library implementation of respective convolutions, one does not need to change anything. The only extra implementation is the weighted concatenation of segmentation maps.
 \end{enumerate}
 
-Manual work can be saved by using a lower resolution for the segmentations and computational effort as well as memory can be saved by increasing the stride between successive patches. Neither of these simplifications have a large impact on practical results.
+Manual work can be saved by using a lower resolution for the segmentations and computational effort as well as memory can be saved by increasing the stride between successive patches. Applied moderately, neither of these simplifications have a large impact on practical results.
 
 \subsection{Content Loss}
 
-Content loss can be added without additional modifications to the original approach of Gatys et al. \cite{gatys2015neural}. With regard to semantic maps, it merits mentioning that much like the original implementation of \cite{doodles2016}, our present implementation can be run in a mode that requires a content segmentation but does not require a content image. In this mode, texture is merely semantically transfered from the style image to the content image. Content loss ist omitted, the total loss being minimized is exactly the style loss. Figure \ref{fig::nocontent} shows results for this mode. This is what the title of the present work refers to as a \textbf{Neural Doodle}.
+Content loss can be added without additional modifications to the original approach of Gatys et al. \cite{gatys2015neural}. With regard to semantic maps, it merits mentioning that much like the original implementation of \cite{doodles2016}, our present implementation can be run in a mode that requires a content segmentation but does not require a content image. In this mode, texture is merely semantically transfered from the style image to the content image. Content loss ist omitted, the total loss being minimized is exactly the style loss. Figure \ref{fig::nocontent} shows results for this mode. This is what the title of the present work refers to as a \emph{Neural Doodle}.
 
 \begin{figure}
 	\begin{subfigure}[t]{0.32\textwidth}

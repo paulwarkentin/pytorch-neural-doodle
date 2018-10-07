@@ -34,3 +34,37 @@ We reproduced the results of \cite{doodles2016} by implementing the described al
 	\caption[]{Progress of an L-BFGS optimizer for the generation of a stylized image. Iteration count from left to right: 50, 200, 400, 500.}
 	\label{fig::phases}
 \end{figure}
+
+When using modern hardware (at the time of writing e.g. an NVIDIA GTX 1080 Ti) with sufficient GPU memory, generating a single image requires computation time on the order of minutes. The samples in figure \ref{fig::nocontent} were generated in approximately eight minutes each. 
+
+In addition to the examples presented in \cite{doodles2016}, we chose another content and style image and authored a segmentation. The results are presented in figure \ref{fig::freddie}
+
+\begin{figure}
+	\begin{subfigure}[t]{0.18\textwidth}
+		\centering
+		\includegraphics[width=2.9cm]{freddie/freddie.png}
+	\end{subfigure}%\hspace{5mm}
+	~
+	\begin{subfigure}[t]{0.18\textwidth}
+		\centering
+		\includegraphics[width=2.9cm]{freddie/freddie_map.png}
+	\end{subfigure}%\hspace{5mm}
+	~
+	\begin{subfigure}[t]{0.18\textwidth}
+		\centering
+		\includegraphics[width=2.9cm]{freddie/bergeron.png}
+	\end{subfigure}
+	~
+	\begin{subfigure}[t]{0.18\textwidth}
+		\centering
+		\includegraphics[width=2.9cm]{freddie/bergeron_map.png}
+	\end{subfigure}
+	~
+	\begin{subfigure}[t]{0.18\textwidth}
+		\centering
+		\includegraphics[width=2.9cm]{freddie/result.png}
+	\end{subfigure}
+	
+	\caption[]{Application of full artistic style transfer. From left to right: Content image, content segmentation, style image, style segmentation, generated result.}
+	\label{fig::freddie}
+\end{figure}
