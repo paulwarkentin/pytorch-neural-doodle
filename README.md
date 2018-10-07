@@ -18,7 +18,7 @@ This project is a research project created in fulfillment of requirements for th
 ├─ models/                      <- pre-trained weights and frozen models
 │  └─ vgg_19_imagenet/          <- pre-trained VGG 19 weights
 ├─ runs/                        <- run configurations and saved checkpoints
-│  └─ run_*/                       created by src/generated.py
+│  └─ run_*/                       created by src/generate.py
 ├─ src/
 │  ├─ loss/                     <- loss implementation
 │  ├─ models/                   <- model implementation
