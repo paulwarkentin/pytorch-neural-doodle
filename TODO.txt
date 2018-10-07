@@ -1,2 +1,0 @@
-* argparse validation in generate.py: --style-layers and --content-layers need to be validated as "list of string" type
-* it would be nice to have a utility that estimates the memory requirements of the pending execution such that one can be warned beforehand

@@ -2,27 +2,20 @@
 ## pytorch-neural-doodle/src/loss/style.py
 ##
 ## Created by Bastian Boll <mail@bbboll.com> on 29/08/2018.
-## Created by Bastian Boll <mail@bbboll.com> on 02/09//2018.
-
-import os.path
-import sys
-
-__exec_dir = sys.path[0]
-while os.path.basename(__exec_dir) != "src":
-	__exec_dir = os.path.dirname(__exec_dir)
-	sys.path.insert(0, __exec_dir)
+## Updated by Bastian Boll <paul@warkentin.email> on 06/10/2018.
 
 import numpy as np
+import os.path
+import sys
 import torch
 import torch.nn as nn
+
 
 class StyleLoss(nn.Module):
 	"""A PyTorch module that implements loss w.r.t. style for style transfer.
 
-	For information on this loss function, refer to the documentation 
-	in `pytorch-neural-doodle/docs` or to Champandard
-	"Semantic Style Transfer and Turning Two-Bit Doodles into Fine Artwork"
-	(https://arxiv.org/pdf/1603.01768.pdf).
+	For information on this loss function, refer to the documentation in `pytorch-neural-doodle/docs` or to Champandard "Semantic Style
+	Transfer and Turning Two-Bit Doodles into Fine Artwork" (https://arxiv.org/pdf/1603.01768.pdf).
 
 	Attributes:
 		unfold:               Unfolding convolution to compute patches.
@@ -70,7 +63,7 @@ class StyleLoss(nn.Module):
 			setattr(self, "output_maps{}".format(layer), map_channel_weight*output_map_down*channel_count)
 			setattr(self, "style_normalizer{}".format(layer), style_normalizer)
 
-	
+
 	def loss(self, model_response):
 		"""Compute loss of given image w.r.t. initialized style.
 
@@ -91,13 +84,14 @@ class StyleLoss(nn.Module):
 			similarity_matrix = img_patches.t() @ style_patches
 			img_normalizer = torch.reciprocal(torch.norm(img_patches, p=2, dim=0))
 			style_normalizer = getattr(self, "style_normalizer{}".format(l))
-			similarity_matrix = style_normalizer.expand(patch_count, patch_count) * similarity_matrix 
+			similarity_matrix = style_normalizer.expand(patch_count, patch_count) * similarity_matrix
 			similarity_matrix = img_normalizer.expand(patch_count, patch_count).t() * similarity_matrix
 			nearest_neighbours = torch.argmax(similarity_matrix, dim=1)
-			
+
 			# free up some memory
 			del similarity_matrix
 			del img_normalizer
 
 			losses.append(nn.functional.mse_loss(img_patches, style_patches[:,nearest_neighbours]))
+
 		return sum(losses)

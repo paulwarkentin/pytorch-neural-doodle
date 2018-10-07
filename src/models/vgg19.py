@@ -5,12 +5,11 @@
 ## Updated by Bastian Boll <mail@bbboll.com> on 31/08/2018.
 ##
 
+import os.path
 import pickle
 import torch
 import torch.nn as nn
-
 import sys
-import os.path
 
 __exec_dir = sys.path[0]
 while os.path.basename(__exec_dir) != "src":
@@ -21,8 +20,7 @@ while os.path.basename(__exec_dir) != "src":
 class VGG19(nn.Module):
 	"""A PyTorch module that implements the VGG 19 network for image classification.
 
-	For information on the VGG 19 network see Simonyan & Zisserman
-	"Very Deep Convolutional Networks for Large-Scale Image Recognition"
+	For information on the VGG 19 network see Simonyan & Zisserman "Very Deep Convolutional Networks for Large-Scale Image Recognition"
 	(https://arxiv.org/abs/1409.1556).
 
 	Attributes:
@@ -135,5 +133,5 @@ class VGG19(nn.Module):
 					outputs[conv_name] = x
 
 			x = self.pool(x)
-		
+
 		return outputs

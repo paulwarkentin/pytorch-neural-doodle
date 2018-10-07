@@ -8,11 +8,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class LivePlot(object):
 	"""Continuously updating plot of the target image.
 	"""
+
 	def __init__(self, w, h):
 		super().__init__()
+
 		self.width = w
 		self.height = h
 		self.image = np.zeros((h,w,3), dtype='uint8')
@@ -23,9 +26,9 @@ class LivePlot(object):
 		plt.ion()
 		plt.show()
 
+
 	def update(self, img):
-		"""
-		"""
+		""""""
 		self.image = img.detach().cpu().numpy()
 		self.image = self.image.reshape((3, self.height, self.width)).transpose((1,2,0))
 		self.image = (self.image + 1.0)*(256/2)
