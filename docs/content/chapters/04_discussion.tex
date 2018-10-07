@@ -5,8 +5,11 @@
 %% Updated by Bastian Boll <mail@bbboll.com> on 07/10/2018.
 %%
 
+\clearpage
 \section{Discussion}
 \label{section:discussion}
+
+\textbf{by Bastian Boll and Paul Warkentin} \\
 
 Examining the results, it is easy to see that there is a considerable influence of parameter choices. Not weighting style and content against each other appropriately results in the uneven balance of content and texture. This does, as has been noted, not present an effective lever against common glitches in the classic model of style transfer of Gatys et al. The incorporation of semantic maps does in fact serve as such a lever. Our experiments also corroborate Champandards point of viewing semantic segmentation as an artistic tool. Authoring of these maps is an artistic endeavour and serves to increase both the visual quality and artistic originality of the resulting images. 
 
@@ -18,4 +21,3 @@ With regard to the practical implementation, there is a lot of performance poten
 
 In a very recent paper, Sanakoyeu and Kotovenko \cite{sanakoyeu2018style} propose an encoder-decoder architecture which pays much more regard to art historic considerations and circumvents the potential introduction of bias from using a VGG network pretrained on a large image dataset. For the specific purpose of artistic style transfer, we see this work as a considerable improvement upon all methods presented above. This is due to its ability to meaningfully learn from more than one example of a given style. It also displays impressive performance characteristics and is the first (to our knowledge) to produce results impressive to art historians.
 
-% art historic approach, bias of imagenet, encoder-decoder (Hamprecht)

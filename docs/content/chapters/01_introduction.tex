@@ -8,7 +8,7 @@
 \section{Introduction}
 \label{section:introduction}
 
-% TODO: what exactly is style transfer anyway?
+\textbf{by Bastian Boll} \\
 
 In light of meaningful advances in the field of image classification using convolutional neural networks (CNNs) \cite{vgg2014}, interest has been sparked to exploit the inverse process for image generation. Because the intrinsic dimension of the input image space \(I\) is generally much larger than the intrinsic dimension of the label space \(L\), such a CNN cannot canonically be a bijective mapping. The inverse process can therefore be seen as selecting an element \(x\) of the preimage \(\mathrm{CNN}^{-1}(y)\) for a fixed label \(y\in L\) such that a measure of visual or artistic appeal is maximized.
 
@@ -50,12 +50,3 @@ where \(\text{NN}(i)\) refers to the index of the nearest neighbour patch of \(\
 Using a patch-based style loss reduces the overall number of glitches in the generated image, as the algorithm respects local pixel statistics and is not exclusively guided by global correlations.
 
 Having defined and explored the problem domain of artistic style transfer, subsequent work focuses on more practical and artistic aspects. While the number of glitches can and should be reduced by the means described above, one can certainly see the point of wanting to interact with the algorithm at work. Opening up hooks for interactive input from a user can potentially turn this algorithm into an artistic tool which can be led by human intuition. In this vein, Champandard proposes using semantic segmentation maps of both input style and content images \cite{doodles2016}. The following main part of the present paper focuses on how to implement this approach.
-
-
-%We initialize \(x\) to contain white noise. 
-
-% Artistic control: lack of semantic segmentation, artifacts
-
-% interactive nature of the algorithm renders skillful creation of neural doodles necessary
-
-% 6. Ulyanov et al (2016) introduce an alternative approach based on texture synthesis which mitigates computational cost and memory requirements necessary in the architectures above. This is claimed to yield similar results 500x faster and using an order of magnitude less memory. (see this blog post: https://dmitryulyanov.github.io/feed-forward-neural-doodle/). This is done by exploring the feasible set of images using a generative neural network instead of a classical optimization algorithm (Gatys uses L-BFGS). He also gives a much more convincing statistical motivation for the loss construction and his approach seems to otherwise be mostly orthogonal to the concepts introduced above.
