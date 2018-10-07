@@ -8,10 +8,14 @@
 \section{Discussion}
 \label{section:discussion}
 
-% influence of parameters
+Examining the results, it is easy to see that there is a considerable influence of parameter choices. Not weighting style and content against each other appropriately results in the uneven balance of content and texture. This does, as has been noted, not present an effective lever against common glitches in the classic model of style transfer of Gatys et al. The incorporation of semantic maps does in fact serve as such a lever. Our experiments also corroborate Champandards point of viewing semantic segmentation as an artistic tool. Authoring of these maps is an artistic endeavour and serves to increase both the visual quality and artistic originality of the resulting images. 
 
-% How to not manually author segmentations
+Contrasting this to the approach of \cite{mrf2016}, we can clearly see a focus on generating artwork in \cite{doodles2016} while the former is focused on the more general setting of style transfer. Art to photo is the dividing usecase between both approaches. Champandards approach is not particularly effective for this -- in some respects more technical as opposed to artistic -- challenge. 
 
-% performance potential of feed forward
+While semantic segmentation can in principle definitely serve to improve upon the results of \cite{mrf2016} for even art to photo transfers, one should in our view try and find a way of learning semantic maps suited for this purpose as opposed to manually authoring them. This presents a usecase for the pixel labeling methods e.g. surveyed in \cite{thoma2016survey}. For artistic purposes, automatically generated segmentations can present a convenient starting point to be improved upon by human intuition and artistic originality.
 
-% art historic approach, encoder-decoder (Hamprecht)
+With regard to the practical implementation, there is a lot of performance potential to be leveraged by replacing the optimization procedure proposed by Gatys et al. with a pure feed forward architecture. More specifically, Ulyanov et al. \cite{ulyanov2016texture} claim a 500x performance increase by training a neural network to reproduce a given style directly. The quality of the results is comparable to Gatys et al. while the increased performance puts much higher resolution image generation and video style transfer into the realm of possibility. 
+
+In a very recent paper, Sanakoyeu and Kotovenko \cite{sanakoyeu2018style} propose an encoder-decoder architecture which pays much more regard to art historic considerations and circumvents the potential introduction of bias from using a VGG network pretrained on a large image dataset. For the specific purpose of artistic style transfer, we see this work as a considerable improvement upon all methods presented above. This is due to its ability to meaningfully learn from more than one example of a given style. It also displays impressive performance characteristics and is the first (to our knowledge) to produce results impressive to art historians.
+
+% art historic approach, bias of imagenet, encoder-decoder (Hamprecht)
