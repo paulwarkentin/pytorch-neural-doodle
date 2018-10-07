@@ -8,12 +8,19 @@
 \section{Implementation}
 \label{section:implementation}
 
-\textit{tbd.}
+As a starting point, Champandard examines user behavior while authoring style transfers. This is made possible through a social media bot \cite{deepforger2015}, making artistic style transfer algorithms available to a general public. It can be observed, that in the cases where the algorithm does not meet the users expectation, it is often due to a lack of semantic segmentation of style and content images. As an example, when transfering an artists style to a photographic portrait, one would expect the algorithm to transfer the color and texture of skintones the artist chose to the skin areas of the portrait. While this expectation may at times be met, the patch based style loss constructed above does not generally enforce such a behavior. The usage of semantic segmentation is especially prominent in more specialized approaches to style transfer \cite{yang2017semantic}, suggesting additional merit to the presented intuition.
+
+Note, that convolutional neural networks such as VGG do implicitly learn semantic segmentation of images \cite{thoma2016survey}, but this segmentation is not put to use in the above style loss construction because nearest neighbour patches are selected only with respect to similarity in texture. A segment of sky in the background of a style painting may absolutely be selected as nearest neighbour patch for a skintone area in the content picture, if local texture happens to be similar. This lack of semantic segmentation causes glitches and subverts the intention of the user but the disregard for the semantic segmentation extracted by the convolutional neural network is in some respects a byproduct of the design -- the style loss intentionally uses low layer responses to capture local texture information and to not capture higher level (content) responses such as semantic information. This leaves the user with a very limited number of control levers. Choosing the parameter \(\alpha\) which weights style loss against content loss presents a spectrum between a faithful reproduction of the content image and an unstructured reproduction of style texture with no regard to the content. This is insufficient in practice, especially for abstract styles and in those -- particularly interesting -- cases where style and content image are very dissimilar in perspective or subject.
+
+The core idea of Champandard lies in incorporating segmentation from a semantic map both indirectly as part of the nearest neighbour patch computation and directly into the style loss term.
+
+\subsection{Semantic maps}
+
+% TODO: what are they, examples, channels, generation
 
 \subsection{Style Loss}
 
-% TODO: Gram matrices
-% 		Motivation Ulyanov https://dmitryulyanov.github.io/feed-forward-neural-doodle/
+The semantic map of the style image is processed by the VGG network and activations for specific layers are gathered. In the case of a VGG 19 network, we choose the layers \texttt{conv3\_1} and \texttt{conv4\_1}. 
 
 % TODO: How to incorporate semantic map
 
