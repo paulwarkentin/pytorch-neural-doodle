@@ -20,10 +20,30 @@ The core idea of Champandard lies in incorporating segmentation from a semantic 
 
 \subsection{Style Loss}
 
-The semantic map of the style image is processed by the VGG network and activations for specific layers are gathered. In the case of a VGG 19 network, we choose the layers \texttt{conv3\_1} and \texttt{conv4\_1}. 
+The semantic map of the style image is processed by the VGG network and activations for specific layers are gathered. In the case of a VGG 19 network, we choose the layers \texttt{conv3\_1} and \texttt{conv4\_1}. Denote the response tensor with \(m^s\). This tensor has two spatial dimensions and one channel dimension. The vector \(m^s\) is subsequently scaled by a factor \(\gamma\) and concatenated along the channel dimension with the response vector \(y^s\) of the style image
+\[x^s = y \,||\,\gamma m \]
+The analogous preparation steps are applied to the content image
+\[x^c = y^c \,||\,\gamma m^c \]
+For the reasons outlined in the introduction, a patch-based style loss approach is prefered over a Gram-based approach. We therefore compute \(k\times k\) patches \(\Psi (x^s)\) and \(\Psi (x^c)\) along the spatial dimensions. Our implementation specifically uses \(3\times 3\) patches. 
 
-% TODO: How to incorporate semantic map
+Given \(x^s\) and \(x^c\), the patch-based approach of \cite{mrf2016} can be applied without the need for significant changes. Nearest neighbour patches are computed with respect to normalized cross-correlation and we have the finished patch-based style loss
+\[\mathcal{L}_{s,p}(x^s,x^c) = \sum_i \|\Psi_i(x^c)-\Psi_{\text{NN}(i)}(x^s)\|_2^2\]
+
+The parameter \(\gamma\) can be seen as a user control point, specifying how much the segmentation should be weighted against local pixel conformance during nearest neighbour computation. This specific way of incorporating segmentation maps has two principal upsides:
+\begin{enumerate}
+	\item The segmentation maps can easily be authored, as they do not need to conform to many formal specifications. They can have an arbitrary number of channels and can be drawn with a reduced resolution as compared to the original style- and content image. These are both conveniences in practical use.
+	% embedding segmentation
+	\item The algorithm being used is essentially the same as the patch based approach of \cite{mrf2016} because the datastructure being worked on does only change along the channel dimension and the operations being applied remain the same. In the common library implementation of respective convolutions, one does not need to change anything. The only extra implementation is the weighted concatenation of segmentation maps.
+\end{enumerate}
+
+Manual work can be saved by using a lower resolution for the segmentations and computational effort as well as memory can be saved by increasing the stride between successive patches. Neither of these simplifications have a large impact on practical results.
 
 \subsection{Content Loss}
 
+Content loss can be added without additional modifications to the original approach of Gatys et al. \cite{gatys2015neural}.
+
+% How to: no content loss
+
 \textit{tbd.}
+
+% How to not manually author segmentations
